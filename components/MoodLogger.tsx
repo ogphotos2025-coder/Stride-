@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { Smile, Frown, Meh, Laugh, Angry } from 'lucide-react'
 
 const moods = [
@@ -10,9 +9,15 @@ const moods = [
   { name: 'Angry', icon: <Angry size={32} /> },
 ]
 
-export default function MoodLogger() {
-  const [selectedMood, setSelectedMood] = useState<string | null>(null)
+interface MoodLoggerProps {
+  selectedMood: string | null
+  setSelectedMood: (mood: string) => void
+}
 
+export default function MoodLogger({
+  selectedMood,
+  setSelectedMood,
+}: MoodLoggerProps) {
   return (
     <div className="rounded-xl bg-white p-6 shadow-md">
       <h3 className="text-lg font-semibold text-gray-800">How are you feeling?</h3>

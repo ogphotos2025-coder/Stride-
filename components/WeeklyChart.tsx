@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import {
   ResponsiveContainer,
   BarChart,
@@ -10,25 +11,143 @@ import {
   Line,
   ComposedChart,
 } from 'recharts'
-import { format } from 'date-fns'
+import { useSession } from 'next-auth/react'
+import { addDays, subDays, startOfWeek, endOfWeek, format } from 'date-fns'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { getDailyEntries } from '@/lib/database'
+import { DailyEntry } from '@/types'
 
-const data = [
-  { date: '2024-07-01', steps: 8500, mood: 4 },
-  { date: '2024-07-02', steps: 9200, mood: 5 },
-  { date: '2024-07-03', steps: 4300, mood: 2 },
-  { date: '2024-07-04', steps: 12000, mood: 5 },
-  { date: '2024-07-05', steps: 6000, mood: 3 },
-  { date: '2024-07-06', steps: 14000, mood: 5 },
-  { date: '2024-07-07', steps: 7200, mood: 4 },
-]
+// Map mood strings to numerical scores for charting
+const moodToScore: { [key: string]: number } = {
+  Angry: 1,
+  Sad: 2,
+  Okay: 3,
+  Good: 4,
+  Happy: 5,
+}
 
 export default function WeeklyChart() {
+  const { data: session } = useSession()
+  const [chartData, setChartData] = useState<
+    { date: string; steps: number; mood: number }[]
+  >([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentWeekStart, setCurrentWeekStart] = useState(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  )
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      if (!session?.user?.id) {
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const weekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 })
+        const entries = await getDailyEntries(
+          session.user.id as string,
+          currentWeekStart,
+          weekEnd
+        )
+
+        // Generate data for all 7 days of the week, even if no entry exists
+        const dataMap = new Map<string, { steps: number; mood: number }>()
+        entries.forEach((entry: DailyEntry) => {
+          dataMap.set(entry.date, {
+            steps: entry.step_count,
+            mood: moodToScore[entry.mood] || 0,
+          })
+        })
+
+        const newChartData = Array.from({ length: 7 }).map((_, i) => {
+          const date = addDays(currentWeekStart, i)
+          const formattedDate = format(date, 'yyyy-MM-dd')
+          const entry = dataMap.get(formattedDate)
+          return {
+            date: formattedDate,
+            steps: entry?.steps || 0,
+            mood: entry?.mood || 0,
+          }
+        })
+        setChartData(newChartData)
+      } catch (err) {
+        console.error('Failed to fetch chart data:', err)
+        setError('Failed to load chart data.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchChartData()
+  }, [session, currentWeekStart])
+
+  const goToPreviousWeek = () => {
+    setCurrentWeekStart((prev) => subDays(prev, 7))
+  }
+
+  const goToNextWeek = () => {
+    setCurrentWeekStart((prev) => addDays(prev, 7))
+  }
+
+  const formattedWeekRange = `${format(currentWeekStart, 'MMM d')} - ${format(
+    endOfWeek(currentWeekStart, { weekStartsOn: 1 }),
+    'MMM d, yyyy'
+  )}`
+
+  if (!session) {
+    return (
+      <div className="flex h-72 items-center justify-center rounded-xl bg-white p-6 shadow-md">
+        <p className="text-gray-500">Sign in to view your weekly progress.</p>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-72 items-center justify-center rounded-xl bg-white p-6 shadow-md">
+        <p>Loading chart data...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-72 items-center justify-center rounded-xl bg-white p-6 shadow-md">
+        <p className="text-red-500">{error}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-xl bg-white p-6 shadow-md">
-      <h3 className="text-lg font-semibold text-gray-800">Your Week at a Glance</h3>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-800">Your Week at a Glance</h3>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={goToPreviousWeek}
+            className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className="text-sm font-medium text-gray-700">
+            {formattedWeekRange}
+          </span>
+          <button
+            onClick={goToNextWeek}
+            className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
       <div className="mt-4 h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data}>
+          <ComposedChart data={chartData}>
             <XAxis
               dataKey="date"
               tickFormatter={(date) => format(new Date(date), 'EEE')}

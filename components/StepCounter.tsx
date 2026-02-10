@@ -1,11 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react'
+import { Activity } from 'lucide-react'
 
-export default function StepCounter() {
+interface StepCounterProps {
+  dailySteps: number
+  setDailySteps: (steps: number) => void
+}
+
+export default function StepCounter({ dailySteps, setDailySteps }: StepCounterProps) {
   const { data: session } = useSession()
-  const [steps, setSteps] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -21,7 +25,7 @@ export default function StepCounter() {
         })
         .then((data) => {
           const todaySteps = data.bucket[data.bucket.length - 1]?.dataset[0]?.point[0]?.value[0]?.intVal || 0
-          setSteps(todaySteps)
+          setDailySteps(todaySteps) // Update parent state
           setLoading(false)
         })
         .catch((err) => {
@@ -29,9 +33,10 @@ export default function StepCounter() {
           setLoading(false)
         })
     } else {
+      setDailySteps(0) // Reset if not signed in
       setLoading(false)
     }
-  }, [session])
+  }, [session, setDailySteps])
 
   const isSynced = !!session
 
@@ -63,11 +68,25 @@ export default function StepCounter() {
         )}
       </div>
       <div className="mt-4 flex items-baseline gap-4">
-        <p className="text-4xl font-bold text-primary-600">{steps.toLocaleString()}</p>
+        <p className="text-4xl font-bold text-primary-600">{dailySteps.toLocaleString()}</p>
       </div>
-      <p className="mt-1 text-sm text-gray-500">
-        {isSynced ? 'from Google Fit' : 'Manually entered'}
-      </p>
+      {!isSynced ? (
+        <div className="mt-2">
+          <label htmlFor="manualSteps" className="sr-only">
+            Enter steps manually
+          </label>
+          <input
+            id="manualSteps"
+            type="number"
+            value={dailySteps === 0 ? '' : dailySteps}
+            onChange={(e) => setDailySteps(parseInt(e.target.value || '0', 10))}
+            placeholder="Enter steps manually"
+            className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-700 focus:border-primary-500 focus:ring-primary-500"
+          />
+        </div>
+      ) : (
+        <p className="mt-1 text-sm text-gray-500">from Google Fit</p>
+      )}
     </div>
   )
 }
