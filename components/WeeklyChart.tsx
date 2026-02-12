@@ -45,35 +45,60 @@ export default function WeeklyChart() {
 
       try {
         const weekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 })
+
+        // Fetch Steps from Google Fit
+        const fitRes = await fetch(`/api/googlefit?startTime=${currentWeekStart.getTime()}&endTime=${weekEnd.getTime()}`)
+        const fitData = await fitRes.json()
+
+        // Map Google Fit buckets to dates
+        const fitMap = new Map<string, number>()
+        if (fitData && fitData.bucket) {
+          fitData.bucket.forEach((bucket: any, index: number) => {
+            // Google Fit buckets might not align perfectly with our days, 
+            // but since we bucket by 24h starting at startTime, index 0 is Day 1
+            const date = addDays(currentWeekStart, index)
+            const formattedDate = format(date, 'yyyy-MM-dd')
+            let steps = 0
+            if (bucket.dataset) {
+              bucket.dataset.forEach((ds: any) => {
+                ds.point.forEach((point: any) => {
+                  point.value.forEach((val: any) => {
+                    if (val.intVal) steps += val.intVal
+                  })
+                })
+              })
+            }
+            fitMap.set(formattedDate, steps)
+          })
+        }
+
+        // Fetch Moods from Supabase
         const entries = await getDailyEntries(
           session.user.id as string,
           currentWeekStart,
           weekEnd
         )
 
-        // Generate data for all 7 days of the week, even if no entry exists
-        const dataMap = new Map<string, { steps: number[]; moods: number[] }>()
+        const moodMap = new Map<string, number[]>()
         entries.forEach((entry: DailyEntry) => {
-          if (!dataMap.has(entry.date)) {
-            dataMap.set(entry.date, { steps: [], moods: [] })
+          if (!moodMap.has(entry.date)) {
+            moodMap.set(entry.date, [])
           }
-          const dayData = dataMap.get(entry.date)!
-          dayData.steps.push(entry.step_count)
-          dayData.moods.push(moodToScore[entry.mood] || 0)
+          moodMap.get(entry.date)!.push(moodToScore[entry.mood] || 0)
         })
 
         const newChartData = Array.from({ length: 7 }).map((_, i) => {
           const date = addDays(currentWeekStart, i)
           const formattedDate = format(date, 'yyyy-MM-dd')
-          const dayData = dataMap.get(formattedDate)
+          const dayMoods = moodMap.get(formattedDate)
 
           return {
             date: formattedDate,
-            // Use the maximum step count recorded for that day (since steps are cumulative)
-            steps: dayData && dayData.steps.length > 0 ? Math.max(...dayData.steps) : 0,
-            // Use the average mood score for the day
-            mood: dayData && dayData.moods.length > 0
-              ? dayData.moods.reduce((a, b) => a + b, 0) / dayData.moods.length
+            // Use live Google Fit steps
+            steps: fitMap.get(formattedDate) || 0,
+            // Use average mood from database
+            mood: dayMoods && dayMoods.length > 0
+              ? dayMoods.reduce((a, b) => a + b, 0) / dayMoods.length
               : 0,
           }
         })

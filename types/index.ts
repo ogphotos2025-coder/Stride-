@@ -17,6 +17,7 @@ export interface Database {
           mood: string
           journal_entry: string | null
           step_count: number
+          embedding?: number[] | null
           created_at: string
         }
         Insert: {
@@ -26,6 +27,7 @@ export interface Database {
           mood: string
           journal_entry?: string | null
           step_count: number
+          embedding?: number[] | null
           created_at?: string
         }
         Update: {

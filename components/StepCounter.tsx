@@ -24,8 +24,24 @@ export default function StepCounter({ dailySteps, setDailySteps }: StepCounterPr
           return res.json()
         })
         .then((data) => {
-          const todaySteps = data.bucket[data.bucket.length - 1]?.dataset[0]?.point[0]?.value[0]?.intVal || 0
-          setDailySteps(todaySteps) // Update parent state
+          console.log('Raw Google Fit Data:', data)
+
+          // The last bucket is "Today"
+          const lastBucket = data.bucket[data.bucket.length - 1]
+          let totalTodaySteps = 0
+
+          if (lastBucket && lastBucket.dataset) {
+            lastBucket.dataset.forEach((ds: any) => {
+              ds.point.forEach((point: any) => {
+                point.value.forEach((val: any) => {
+                  if (val.intVal) totalTodaySteps += val.intVal
+                })
+              })
+            })
+          }
+
+          console.log('Calculated Today Steps:', totalTodaySteps)
+          setDailySteps(totalTodaySteps)
           setLoading(false)
         })
         .catch((err) => {

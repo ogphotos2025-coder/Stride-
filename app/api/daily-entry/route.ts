@@ -4,6 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { addDailyEntry } from '@/lib/database'
 import { DailyEntry } from '@/types'
 import { format } from 'date-fns'
+import { generateEmbedding } from '@/lib/ai'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -24,12 +25,22 @@ export async function POST(req: NextRequest) {
 
     const today = format(new Date(), 'yyyy-MM-dd')
 
-    const newEntry: Omit<DailyEntry, 'id' | 'created_at'> = {
+    let embedding = null
+    if (journal_entry && journal_entry.trim().length > 0) {
+      try {
+        embedding = await generateEmbedding(journal_entry)
+      } catch (err) {
+        console.error('Failed to generate embedding, continuing without it:', err)
+      }
+    }
+
+    const newEntry: any = {
       user_id: session.user.id as string,
       date: today,
       mood,
       journal_entry: journal_entry || null,
       step_count: parseInt(step_count, 10),
+      embedding: embedding
     }
 
     const entry = await addDailyEntry(newEntry)

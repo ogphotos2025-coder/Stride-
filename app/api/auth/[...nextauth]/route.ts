@@ -1,18 +1,7 @@
 import NextAuth, { NextAuthOptions, Account, User, Session } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 import GoogleProvider from 'next-auth/providers/google'
-import { SupabaseAdapter } from '@next-auth/supabase-adapter' // Import the adapter
 
-// Initialize Supabase client for the adapter (using service_role key)
-const SUPABASE_URL = String(process.env.NEXT_PUBLIC_SUPABASE_URL || '');
-const SUPABASE_SERVICE_ROLE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '');
-
-if (!SUPABASE_URL) {
-  throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable.");
-}
-if (!SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY environment variable.");
-}
 if (!process.env.GOOGLE_CLIENT_ID) {
   throw new Error("Missing GOOGLE_CLIENT_ID environment variable.");
 }
@@ -41,10 +30,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  adapter: SupabaseAdapter({
-    url: SUPABASE_URL,
-    secret: SUPABASE_SERVICE_ROLE_KEY,
-  }),
   session: {
     strategy: 'jwt',
   },

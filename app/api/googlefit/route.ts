@@ -2,8 +2,11 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
+  const { searchParams } = new URL(req.url)
+  const startParam = searchParams.get('startTime')
+  const endParam = searchParams.get('endTime')
 
   if (!session) {
     console.error('Google Fit API Trace: No session found.')
@@ -15,11 +18,11 @@ export async function GET() {
     return NextResponse.json({ error: 'Missing access token.' }, { status: 401 })
   }
 
-  console.log('Google Fit API Trace: Fetching data for user:', session.user?.email)
-
-  const now = new Date()
-  const startTime = new Date()
-  startTime.setDate(now.getDate() - 7)
+  const now = endParam ? new Date(parseInt(endParam)) : new Date()
+  const startTime = startParam ? new Date(parseInt(startParam)) : new Date()
+  if (!startParam) {
+    startTime.setDate(now.getDate() - 7)
+  }
 
   try {
     const response = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
