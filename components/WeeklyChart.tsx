@@ -39,11 +39,7 @@ export default function WeeklyChart() {
 
   useEffect(() => {
     const fetchChartData = async () => {
-      if (!session?.user?.id) {
-        setLoading(false)
-        return
-      }
-
+      if (!session?.user?.id) return
       setLoading(true)
       setError(null)
 
@@ -56,22 +52,29 @@ export default function WeeklyChart() {
         )
 
         // Generate data for all 7 days of the week, even if no entry exists
-        const dataMap = new Map<string, { steps: number; mood: number }>()
+        const dataMap = new Map<string, { steps: number[]; moods: number[] }>()
         entries.forEach((entry: DailyEntry) => {
-          dataMap.set(entry.date, {
-            steps: entry.step_count,
-            mood: moodToScore[entry.mood] || 0,
-          })
+          if (!dataMap.has(entry.date)) {
+            dataMap.set(entry.date, { steps: [], moods: [] })
+          }
+          const dayData = dataMap.get(entry.date)!
+          dayData.steps.push(entry.step_count)
+          dayData.moods.push(moodToScore[entry.mood] || 0)
         })
 
         const newChartData = Array.from({ length: 7 }).map((_, i) => {
           const date = addDays(currentWeekStart, i)
           const formattedDate = format(date, 'yyyy-MM-dd')
-          const entry = dataMap.get(formattedDate)
+          const dayData = dataMap.get(formattedDate)
+
           return {
             date: formattedDate,
-            steps: entry?.steps || 0,
-            mood: entry?.mood || 0,
+            // Use the maximum step count recorded for that day (since steps are cumulative)
+            steps: dayData && dayData.steps.length > 0 ? Math.max(...dayData.steps) : 0,
+            // Use the average mood score for the day
+            mood: dayData && dayData.moods.length > 0
+              ? dayData.moods.reduce((a, b) => a + b, 0) / dayData.moods.length
+              : 0,
           }
         })
         setChartData(newChartData)

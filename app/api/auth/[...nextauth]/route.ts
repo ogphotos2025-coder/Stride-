@@ -1,4 +1,5 @@
-import NextAuth from 'next-auth'
+import NextAuth, { NextAuthOptions, Account, User, Session } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
 import GoogleProvider from 'next-auth/providers/google'
 import { SupabaseAdapter } from '@next-auth/supabase-adapter' // Import the adapter
 
@@ -12,8 +13,20 @@ if (!SUPABASE_URL) {
 if (!SUPABASE_SERVICE_ROLE_KEY) {
   throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY environment variable.");
 }
+if (!process.env.GOOGLE_CLIENT_ID) {
+  throw new Error("Missing GOOGLE_CLIENT_ID environment variable.");
+}
+if (!process.env.GOOGLE_CLIENT_SECRET) {
+  throw new Error("Missing GOOGLE_CLIENT_SECRET environment variable.");
+}
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("Missing NEXTAUTH_SECRET environment variable.");
+}
+if (!process.env.NEXTAUTH_URL) {
+  throw new Error("Missing NEXTAUTH_URL environment variable.");
+}
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -23,7 +36,7 @@ export const authOptions = {
           prompt: 'consent',
           access_type: 'offline',
           response_type: 'code',
-          scope: 'openid email profile https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read',
+          scope: 'openid email profile https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.activity.write',
         },
       },
     }),
@@ -31,25 +44,34 @@ export const authOptions = {
   adapter: SupabaseAdapter({
     url: SUPABASE_URL,
     secret: SUPABASE_SERVICE_ROLE_KEY,
-  }), // Use the Supabase Adapter
+  }),
+  session: {
+    strategy: 'jwt',
+  },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account, user }) { // Restore 'account' parameter
+    async jwt({ token, account, user }: { token: JWT; account: Account | null; user?: User }) {
       // Persist the OAuth access_token and the user id to the token right after signin
       if (account) {
-        token.accessToken = account.access_token // Store provider's access token
+        token.accessToken = account.access_token
+        token.refreshToken = account.refresh_token
+        token.expiresAt = account.expires_at
       }
-      // The adapter populates user.id with the Supabase UUID
       if (user) {
-        token.id = user.id // Store Supabase UUID
+        token.id = user.id
       }
       return token
     },
-    async session({ session, token }) {
-      // Send properties to the client, such as an access_token and user id from a JWT
-      session.accessToken = token.accessToken
-      session.user.id = token.id as string // Assign the Supabase UUID as the user ID
+    async session({ session, token }: { session: Session; token: JWT }) {
+      session.accessToken = token.accessToken as string
+      session.user.id = token.id as string
       return session
+    },
+  },
+  debug: true, // Enable debug messages in the console if you are having problems
+  logger: {
+    error(code, metadata) {
+      console.error('NextAuth Error Callback:', code, metadata)
     },
   },
 }

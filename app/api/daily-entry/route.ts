@@ -33,12 +33,12 @@ export async function POST(req: NextRequest) {
     }
 
     const entry = await addDailyEntry(newEntry)
-
+    console.log('Daily Entry Saved Successfully:', entry)
     return NextResponse.json(entry, { status: 201 })
-  } catch (error) {
-    console.error('Error saving daily entry:', error)
+  } catch (error: any) {
+    console.error('CRITICAL ERROR in /api/daily-entry:', error)
     return NextResponse.json(
-      { error: 'Failed to save daily entry' },
+      { error: 'Failed to save daily entry', details: error.message },
       { status: 500 }
     )
   }

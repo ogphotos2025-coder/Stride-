@@ -11,13 +11,13 @@ export const getDailyEntries = async (userId: string, startDate?: Date, endDate?
 
   if (startDate && endDate) {
     query = query.gte('date', format(startDate, 'yyyy-MM-dd'))
-                 .lte('date', format(endDate, 'yyyy-MM-dd'))
+      .lte('date', format(endDate, 'yyyy-MM-dd'))
   } else {
     // Default to last 7 days if no date range is provided
     const defaultEndDate = new Date()
     const defaultStartDate = subDays(defaultEndDate, 6)
     query = query.gte('date', format(defaultStartDate, 'yyyy-MM-dd'))
-                 .lte('date', format(defaultEndDate, 'yyyy-MM-dd'))
+      .lte('date', format(defaultEndDate, 'yyyy-MM-dd'))
   }
 
   const { data, error } = await query
@@ -32,7 +32,7 @@ export const getDailyEntries = async (userId: string, startDate?: Date, endDate?
 export const addDailyEntry = async (entry: Omit<DailyEntry, 'id' | 'created_at'>) => {
   const { data, error } = await supabase
     .from('daily_entries')
-    .insert([entry])
+    .insert([entry]) // Use insert to allow multiple entries per day
     .select()
 
   if (error) {
