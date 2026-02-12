@@ -44,7 +44,8 @@ export async function GET(req: NextRequest) {
                 const { data: matches, error: matchError } = await (supabase as any).rpc('match_entries', {
                     query_embedding: embedding,
                     match_threshold: 0.5,
-                    match_count: 3
+                    match_count: 3,
+                    p_user_id: session.user.id
                 })
 
                 if (matchError) {
