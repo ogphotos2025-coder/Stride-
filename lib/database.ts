@@ -3,7 +3,7 @@ import { DailyEntry } from '@/types'
 import { format, subDays } from 'date-fns'
 
 export const getDailyEntries = async (userId: string, startDate?: Date, endDate?: Date) => {
-  let query = supabase
+  let query = (supabase as any)
     .from('daily_entries')
     .select('*')
     .eq('user_id', userId)
@@ -30,7 +30,7 @@ export const getDailyEntries = async (userId: string, startDate?: Date, endDate?
 }
 
 export const addDailyEntry = async (entry: Omit<DailyEntry, 'id' | 'created_at'>) => {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('daily_entries')
     .insert([entry]) // Use insert to allow multiple entries per day
     .select()

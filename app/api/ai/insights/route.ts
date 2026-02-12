@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { generateEmbedding, generateInsight } from '@/lib/ai'
 
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
                 const embedding = await generateEmbedding(latest.journal_entry)
 
                 // 3. Search for similar past entries using the RPC function we created
-                const { data: matches, error: matchError } = await supabase.rpc('match_entries', {
+                const { data: matches, error: matchError } = await (supabase as any).rpc('match_entries', {
                     query_embedding: embedding,
                     match_threshold: 0.5,
                     match_count: 3

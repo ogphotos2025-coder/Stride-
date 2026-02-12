@@ -11,7 +11,7 @@ export async function generateEmbedding(text: string) {
             content: { parts: [{ text }], role: 'user' },
             taskType: 'RETRIEVAL_DOCUMENT',
             outputDimensionality: 1536
-        })
+        } as any)
         return result.embedding.values
     } catch (error: any) {
         console.error('Error generating embedding:', error.message)
