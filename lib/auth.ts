@@ -21,6 +21,18 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
     },
     secret: process.env.NEXTAUTH_SECRET,
+    // Add logging to see exact errors in Vercel Logs
+    logger: {
+        error(code, metadata) {
+            console.error('NEXTAUTH_ERROR', code, metadata)
+        },
+        warn(code) {
+            console.warn('NEXTAUTH_WARN', code)
+        },
+        debug(code, metadata) {
+            console.log('NEXTAUTH_DEBUG', code, metadata)
+        },
+    },
     callbacks: {
         async jwt({ token, account, user }: { token: JWT; account: Account | null; user?: User }) {
             if (account) {
