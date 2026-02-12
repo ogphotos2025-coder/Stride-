@@ -62,9 +62,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen pb-20">
-      {/* Marathon Header */}
-      <header className="bg-[var(--primary-navy)] text-white py-12 px-6 mb-12 shadow-xl skew-y-[-1deg] -mt-4 origin-top-left">
-        <div className="max-w-6xl mx-auto flex justify-between items-center skew-y-[1deg]">
+      {/* Marathon Header - Straightened */}
+      <header className="bg-[var(--primary-navy)] text-white py-12 px-6 mb-12 shadow-xl border-b-4 border-[var(--accent-orange)]">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-6xl italic leading-none">Stride & Soul</h1>
             <p className="text-orange-400 font-bold tracking-widest mt-2">BELIEVE IN EVERY STEP</p>
@@ -79,8 +79,8 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Left Column: Logging */}
           <div className="lg:col-span-7 space-y-12">
-            <div className="marathon-card bg-orange-50 border-orange-100">
-              <h2 className="text-3xl mb-6 text-[var(--accent-orange)]">Mental Check-in</h2>
+            <div className="marathon-card bg-blue-50 border-blue-100 border-l-8 border-l-[var(--primary-navy)]">
+              <h2 className="text-3xl mb-6 text-[var(--primary-navy)]">Mood Entry</h2>
               <MoodLogger
                 selectedMood={selectedMood}
                 setSelectedMood={setSelectedMood}
@@ -92,8 +92,7 @@ export default function Home() {
               <StepCounter dailySteps={dailySteps} setDailySteps={setDailySteps} />
             </div>
 
-            <div className="marathon-card bg-[var(--primary-navy)] text-white border-none">
-              <h2 className="text-3xl mb-6 text-orange-400">Post-Run Brain Dump</h2>
+            <div className="marathon-card bg-[var(--primary-navy)] text-white border-none shadow-2xl">
               <JournalEntry
                 journalEntryText={journalEntryText}
                 setJournalEntryText={setJournalEntryText}

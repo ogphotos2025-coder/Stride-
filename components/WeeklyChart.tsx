@@ -223,7 +223,7 @@ export default function WeeklyChart() {
             <Bar
               yAxisId="left"
               dataKey="steps"
-              name="Stride (Steps)"
+              name="Steps"
               fill="var(--primary-navy)"
               radius={[6, 6, 0, 0]}
               barSize={40}
@@ -232,10 +232,10 @@ export default function WeeklyChart() {
               yAxisId="right"
               type="monotone"
               dataKey="mood"
-              name="Spirit (Mood)"
-              stroke="var(--accent-orange)"
+              name="Mood"
+              stroke="#0ea5e9"
               strokeWidth={4}
-              dot={{ r: 6, fill: 'var(--accent-orange)', strokeWidth: 2, stroke: '#fff' }}
+              dot={{ r: 6, fill: '#0ea5e9', strokeWidth: 2, stroke: '#fff' }}
               activeDot={{ r: 10 }}
             />
           </ComposedChart>
