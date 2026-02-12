@@ -8,6 +8,7 @@ import WeeklyChart from '@/components/WeeklyChart'
 import Link from 'next/link'
 import { Settings } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import { format } from 'date-fns'
 
 export default function Home() {
   const { data: session } = useSession()
@@ -47,6 +48,7 @@ export default function Home() {
           mood: selectedMood,
           journal_entry: journalEntryText,
           step_count: dailySteps,
+          date: format(new Date(), 'yyyy-MM-dd'),
         }),
       })
 

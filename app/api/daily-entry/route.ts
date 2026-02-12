@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { mood, journal_entry, step_count } = await req.json()
+    const { mood, journal_entry, step_count, date } = await req.json()
 
     if (!mood || !step_count) {
       return NextResponse.json(
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const today = format(new Date(), 'yyyy-MM-dd')
+    const entryDate = date || format(new Date(), 'yyyy-MM-dd')
 
     let embedding = null
     if (journal_entry && journal_entry.trim().length > 0) {
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     const newEntry: any = {
       user_id: session.user.id as string,
-      date: today,
+      date: entryDate,
       mood,
       journal_entry: journal_entry || null,
       step_count: parseInt(step_count, 10),
