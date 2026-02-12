@@ -19,21 +19,22 @@ export default function MoodLogger({
   setSelectedMood,
 }: MoodLoggerProps) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-md">
-      <h3 className="text-lg font-semibold text-gray-800">How are you feeling?</h3>
-      <div className="mt-4 flex justify-around">
+    <div className="space-y-6">
+      <h3 className="text-3xl">Mental State</h3>
+      <div className="grid grid-cols-5 gap-4">
         {moods.map((mood) => (
           <button
             key={mood.name}
             onClick={() => setSelectedMood(mood.name)}
-            className={`flex flex-col items-center gap-2 rounded-lg p-3 transition-all duration-200 ${
-              selectedMood === mood.name
-                ? 'bg-primary-100 text-primary-600'
-                : 'text-gray-500 hover:bg-gray-100'
-            }`}
+            className={`flex flex-col items-center gap-4 rounded-2xl p-6 transition-all duration-300 border-2 ${selectedMood === mood.name
+                ? 'bg-white border-[var(--accent-orange)] text-[var(--accent-orange)] shadow-xl scale-110'
+                : 'bg-white/50 border-transparent text-gray-400 hover:bg-white hover:border-gray-200'
+              }`}
           >
-            {mood.icon}
-            <span className="text-xs font-medium">{mood.name}</span>
+            <div className={`transition-transform duration-300 ${selectedMood === mood.name ? 'scale-125' : ''}`}>
+              {mood.icon}
+            </div>
+            <span className="text-xs font-black uppercase tracking-widest">{mood.name}</span>
           </button>
         ))}
       </div>

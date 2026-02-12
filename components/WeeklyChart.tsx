@@ -161,41 +161,47 @@ export default function WeeklyChart() {
   }
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow-md">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">Your Week at a Glance</h3>
-        <div className="flex items-center space-x-2">
+    <div className="marathon-card">
+      <div className="mb-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <h3 className="text-3xl">Pace & Soul</h3>
+        <div className="flex items-center bg-gray-50 px-6 py-2 rounded-full border border-gray-200">
           <button
             onClick={goToPreviousWeek}
-            className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+            className="p-2 transition-colors hover:text-[var(--accent-orange)]"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={24} />
           </button>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-black uppercase tracking-widest px-4">
             {formattedWeekRange}
           </span>
           <button
             onClick={goToNextWeek}
-            className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+            className="p-2 transition-colors hover:text-[var(--accent-orange)]"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={24} />
           </button>
         </div>
       </div>
-      <div className="mt-4 h-72">
+      <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData}>
+          <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <XAxis
               dataKey="date"
               tickFormatter={(date) => format(new Date(date), 'EEE')}
-              stroke="#6b7280"
-              fontSize={12}
+              stroke="var(--text-muted)"
+              fontSize={14}
+              fontWeight="bold"
+              axisLine={false}
+              tickLine={false}
             />
             <YAxis
               yAxisId="left"
               dataKey="steps"
-              stroke="#6b7280"
+              stroke="var(--text-muted)"
               fontSize={12}
+              fontWeight="bold"
+              axisLine={false}
+              tickLine={false}
             />
             <YAxis
               yAxisId="right"
@@ -203,25 +209,34 @@ export default function WeeklyChart() {
               dataKey="mood"
               domain={[1, 5]}
               tickCount={5}
-              stroke="#6b7280"
-              fontSize={12}
+              stroke="var(--accent-orange)"
+              fontSize={14}
+              fontWeight="black"
+              axisLine={false}
+              tickLine={false}
             />
-            <Tooltip />
-            <Legend />
+            <Tooltip
+              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '16px' }}
+              itemStyle={{ fontWeight: 'bold' }}
+            />
+            <Legend wrapperStyle={{ paddingTop: '20px', fontWeight: 'bold' }} />
             <Bar
               yAxisId="left"
               dataKey="steps"
-              name="Steps"
-              fill="#0ea5e9"
-              radius={[4, 4, 0, 0]}
+              name="Stride (Steps)"
+              fill="var(--primary-navy)"
+              radius={[6, 6, 0, 0]}
+              barSize={40}
             />
             <Line
               yAxisId="right"
               type="monotone"
               dataKey="mood"
-              name="Mood"
-              stroke="#f59e0b"
-              strokeWidth={2}
+              name="Spirit (Mood)"
+              stroke="var(--accent-orange)"
+              strokeWidth={4}
+              dot={{ r: 6, fill: 'var(--accent-orange)', strokeWidth: 2, stroke: '#fff' }}
+              activeDot={{ r: 10 }}
             />
           </ComposedChart>
         </ResponsiveContainer>

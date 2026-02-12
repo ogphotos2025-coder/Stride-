@@ -19,43 +19,53 @@ export default function JournalEntry({
   saveSuccess,
 }: JournalEntryProps) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-md">
-      <h3 className="text-lg font-semibold text-gray-800">Brain Dump</h3>
-      <p className="mt-1 text-sm text-gray-500">Let it all out. No judgment.</p>
+    <div className="space-y-6">
+      <div className="flex items-end justify-between">
+        <div>
+          <h3 className="text-3xl text-orange-400">Mental Log</h3>
+          <p className="text-gray-300 italic">Clear your head for the next mile.</p>
+        </div>
+      </div>
+
       <textarea
         value={journalEntryText}
         onChange={(e) => setJournalEntryText(e.target.value)}
-        className="mt-4 w-full rounded-md border border-gray-300 p-3 text-sm text-gray-700 focus:border-primary-500 focus:ring-primary-500"
+        className="w-full bg-white/10 rounded-2xl border-2 border-white/20 p-6 text-xl text-white placeholder-white/30 focus:outline-none focus:border-orange-500 transition-colors focus:bg-white/15"
         rows={6}
-        placeholder="What's on your mind?"
+        placeholder="Unfiltered training notes..."
         disabled={isSaving}
       />
-      <div className="mt-2 flex items-center justify-between">
-        <span className="text-xs font-medium text-gray-400">
-          {journalEntryText.length} / 1000
+
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-black uppercase tracking-widest text-white/40">
+          Character Count: {journalEntryText.length} / 1000
         </span>
         <button
           onClick={onSave}
           disabled={isSaving}
-          className="flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-primary-700 disabled:opacity-50"
+          className="btn-nyrr"
         >
           {isSaving ? (
-            <Loader2 size={16} className="animate-spin" />
+            <div className="flex items-center gap-3">
+              <Loader2 size={24} className="animate-spin" />
+              <span>SAVING...</span>
+            </div>
           ) : (
-            'Save Entry'
+            'Sync Entry'
           )}
         </button>
       </div>
+
       {saveSuccess && (
-        <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
-          <CheckCircle size={16} />
-          <span>Entry saved successfully!</span>
+        <div className="p-4 bg-green-500/20 text-green-400 rounded-xl border border-green-500/30 flex items-center gap-3 font-bold uppercase text-xs tracking-widest">
+          <CheckCircle size={20} />
+          <span>Sync Successful</span>
         </div>
       )}
       {saveError && (
-        <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
-          <XCircle size={16} />
-          <span>{saveError}</span>
+        <div className="p-4 bg-red-500/20 text-red-400 rounded-xl border border-red-500/30 flex items-center gap-3 font-bold uppercase text-xs tracking-widest">
+          <XCircle size={20} />
+          <span>Error: {saveError}</span>
         </div>
       )}
     </div>

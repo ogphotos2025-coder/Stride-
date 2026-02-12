@@ -41,21 +41,25 @@ export default function InsightCard() {
   }
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow-md transition-all hover:shadow-lg">
-      <h3 className="text-lg font-semibold text-gray-800">Soul's Insight</h3>
-      <div className="mt-4 space-y-4">
-        <p className="text-sm leading-relaxed text-gray-700">{insight.insight_text}</p>
-        <div className="rounded-lg bg-primary-50 p-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-primary-700">Tomorrow's Micro-Goal</h4>
-          <p className="mt-1 text-sm font-medium text-primary-900">
+    <div className="marathon-card bg-white border-l-8 border-l-[var(--accent-orange)]">
+      <h3 className="text-3xl mb-6">Performance Coach</h3>
+      <div className="space-y-6">
+        <p className="text-xl leading-relaxed italic text-[var(--text-main)] italic">
+          "{insight.insight_text}"
+        </p>
+
+        <div className="bg-[var(--primary-navy)] p-8 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+          <h4 className="border-b border-white/10 pb-2 mb-4">Tomorrow's Milestone</h4>
+          <p className="text-2xl font-black italic text-orange-400 leading-tight uppercase">
             {insight.tomorrow_micro_goal}
           </p>
         </div>
       </div>
-      <div className="mt-6 flex justify-end">
-        <button className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
-          <ThumbsUp size={14} />
-          <span>Helpful</span>
+      <div className="mt-8 flex justify-end">
+        <button className="flex items-center gap-3 group text-gray-400 font-bold uppercase text-xs tracking-widest hover:text-[var(--accent-orange)] transition-colors">
+          <ThumbsUp size={18} className="group-hover:scale-125 transition-transform" />
+          <span>Helpful Insight</span>
         </button>
       </div>
     </div>

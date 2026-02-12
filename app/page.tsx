@@ -20,17 +20,12 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = useState(false)
 
   const handleSaveEntry = async () => {
-    console.log('Session object during save attempt:', session);
     if (!session?.user?.id) {
-      setSaveError('You must be signed in to save entries.')
+      setSaveError('Sign in to sync your progress.')
       return
     }
     if (!selectedMood) {
-      setSaveError('Please select a mood.')
-      return
-    }
-    if (dailySteps <= 0) {
-      setSaveError('Please enter your daily steps.')
+      setSaveError('Record your mental state.')
       return
     }
 
@@ -54,51 +49,81 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save entry.')
+        throw new Error(errorData.error || 'Failed to finish.')
       }
 
       setSaveSuccess(true)
-      // Optionally reset form fields or show a success message
     } catch (error: any) {
-      setSaveError(error.message || 'An unexpected error occurred.')
+      setSaveError(error.message || 'Connection error.')
     } finally {
       setIsSaving(false)
     }
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Stride & Soul
-        </p>
-        <div className="fixed right-0 top-0 flex h-16 items-center pr-4 lg:static">
-          <Link href="/settings">
-            <Settings className="h-6 w-6 text-gray-500 hover:text-gray-700" />
+    <main className="min-h-screen pb-20">
+      {/* Marathon Header */}
+      <header className="bg-[var(--primary-navy)] text-white py-12 px-6 mb-12 shadow-xl skew-y-[-1deg] -mt-4 origin-top-left">
+        <div className="max-w-6xl mx-auto flex justify-between items-center skew-y-[1deg]">
+          <div>
+            <h1 className="text-6xl italic leading-none">Stride & Soul</h1>
+            <p className="text-orange-400 font-bold tracking-widest mt-2">BELIEVE IN EVERY STEP</p>
+          </div>
+          <Link href="/settings" className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-colors">
+            <Settings className="h-8 w-8 text-white" />
           </Link>
         </div>
-      </div>
+      </header>
 
-      <div className="w-full max-w-5xl pt-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-          <div className="flex flex-col gap-8">
-            <MoodLogger
-              selectedMood={selectedMood}
-              setSelectedMood={setSelectedMood}
-            />
-            <StepCounter dailySteps={dailySteps} setDailySteps={setDailySteps} />
-            <JournalEntry
-              journalEntryText={journalEntryText}
-              setJournalEntryText={setJournalEntryText}
-              onSave={handleSaveEntry}
-              isSaving={isSaving}
-              saveError={saveError}
-              saveSuccess={saveSuccess}
-            />
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Left Column: Logging */}
+          <div className="lg:col-span-7 space-y-12">
+            <div className="marathon-card bg-orange-50 border-orange-100">
+              <h2 className="text-3xl mb-6 text-[var(--accent-orange)]">Mental Check-in</h2>
+              <MoodLogger
+                selectedMood={selectedMood}
+                setSelectedMood={setSelectedMood}
+              />
+            </div>
+
+            <div className="marathon-card">
+              <h2 className="text-3xl mb-4">Training Progress</h2>
+              <StepCounter dailySteps={dailySteps} setDailySteps={setDailySteps} />
+            </div>
+
+            <div className="marathon-card bg-[var(--primary-navy)] text-white border-none">
+              <h2 className="text-3xl mb-6 text-orange-400">Post-Run Brain Dump</h2>
+              <JournalEntry
+                journalEntryText={journalEntryText}
+                setJournalEntryText={setJournalEntryText}
+                onSave={handleSaveEntry}
+                isSaving={isSaving}
+                saveError={saveError}
+                saveSuccess={saveSuccess}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-8">
-            <InsightCard />
-            <WeeklyChart />
+
+          {/* Right Column: Insights */}
+          <div className="lg:col-span-5 space-y-12">
+            <div className="sticky top-12 space-y-12">
+              <section>
+                <h2 className="text-4xl mb-6 flex items-center gap-3 italic">
+                  <span className="w-2 h-10 bg-[var(--accent-orange)] block"></span>
+                  Soul Insights
+                </h2>
+                <InsightCard />
+              </section>
+
+              <section>
+                <h2 className="text-4xl mb-6 flex items-center gap-3 italic">
+                  <span className="w-2 h-10 bg-[var(--primary-navy)] block"></span>
+                  Weekly Stride
+                </h2>
+                <WeeklyChart />
+              </section>
+            </div>
           </div>
         </div>
       </div>

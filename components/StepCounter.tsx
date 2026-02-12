@@ -73,35 +73,48 @@ export default function StepCounter({ dailySteps, setDailySteps }: StepCounterPr
   }
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow-md">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">Daily Steps</h3>
+    <div className="marathon-card overflow-hidden">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-orange-100 rounded-xl">
+            <Activity className="text-[var(--accent-orange)]" size={32} />
+          </div>
+          <h3 className="text-3xl">Total Stride</h3>
+        </div>
         {isSynced && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Activity size={16} className="text-green-500" />
-            <span>Synced</span>
+          <div className="bg-green-100 text-green-700 font-bold px-4 py-1 rounded-full text-xs uppercase tracking-widest flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            Live Performance
           </div>
         )}
       </div>
-      <div className="mt-4 flex items-baseline gap-4">
-        <p className="text-4xl font-bold text-primary-600">{dailySteps.toLocaleString()}</p>
+
+      <div className="flex flex-col items-start">
+        <p className="stat-hero leading-none">
+          {dailySteps.toLocaleString()}
+        </p>
+        <p className="data-label mt-2">Steps Synchronized</p>
       </div>
+
       {!isSynced ? (
-        <div className="mt-2">
-          <label htmlFor="manualSteps" className="sr-only">
-            Enter steps manually
+        <div className="mt-8">
+          <label htmlFor="manualSteps" className="data-label mb-2 block">
+            Manual Calibration
           </label>
           <input
             id="manualSteps"
             type="number"
             value={dailySteps === 0 ? '' : dailySteps}
             onChange={(e) => setDailySteps(parseInt(e.target.value || '0', 10))}
-            placeholder="Enter steps manually"
-            className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-700 focus:border-primary-500 focus:ring-primary-500"
+            placeholder="00,000"
+            className="w-full bg-gray-50 rounded-xl border border-gray-200 p-4 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-[var(--accent-orange)]"
           />
         </div>
       ) : (
-        <p className="mt-1 text-sm text-gray-500">from Google Fit</p>
+        <div className="mt-8 flex items-center gap-2 text-gray-400 font-bold uppercase text-xs tracking-widest">
+          <span className="w-8 h-[2px] bg-gray-200"></span>
+          Integrated with Google Fit
+        </div>
       )}
     </div>
   )
