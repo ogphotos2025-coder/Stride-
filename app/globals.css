@@ -2,6 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gray-50 text-gray-900;
+:root {
+  /* NYRR Inspired Palette */
+  --primary-navy: #001b3d;
+  --accent-orange: #ff5000;
+  --accent-orange-hover: #e64500;
+  --bg-light: #f9fafb;
+  --surface: #ffffff;
+  --text-main: #111827;
+  --text-muted: #4b5563;
+  --border-subtle: #e5e7eb;
+  
+  /* Marathon Specific */
+  --track-green: #0a8a5b;
+  --radius-athletics: 24px;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--bg-light)] text-[var(--text-main)];
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-barlow), sans-serif;
+    @apply font-extrabold uppercase italic tracking-tighter;
+  }
+}
+
+@layer components {
+  .marathon-card {
+    @apply bg-[var(--surface)] border border-[var(--border-subtle)] rounded-[var(--radius-athletics)] shadow-sm p-10 transition-all hover:shadow-xl;
+  }
+
+  .btn-nyrr {
+    @apply bg-[var(--accent-orange)] text-white font-black italic uppercase px-10 py-5 rounded-full transition-all 
+           hover:bg-[var(--accent-orange-hover)] hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+    font-family: var(--font-barlow), sans-serif;
+    font-size: 1.25rem;
+  }
+
+  .stat-hero {
+    @apply text-[14rem] font-black italic tracking-tighter text-[var(--primary-navy)] leading-[0.75];
+    font-family: var(--font-barlow), sans-serif;
+  }
+
+  .data-label {
+    @apply text-lg font-bold uppercase tracking-[0.2em] text-[var(--text-muted)];
+  }
 }
