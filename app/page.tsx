@@ -80,7 +80,7 @@ export default function Home() {
           {/* Left Column: Logging */}
           <div className="lg:col-span-7 space-y-12">
             <div className="marathon-card bg-blue-50 border-blue-100 border-l-8 border-l-[var(--primary-navy)]">
-              <h2 className="text-3xl mb-6 text-[var(--primary-navy)]">Mood Entry</h2>
+              <h2 className="text-3xl mb-6 text-[var(--primary-navy)]">MOOD</h2>
               <MoodLogger
                 selectedMood={selectedMood}
                 setSelectedMood={setSelectedMood}
