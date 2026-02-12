@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@next-auth/supabase-adapter": "^0.2.1",
     "@supabase/supabase-js": "^2.39.0",
     "date-fns": "^3.3.1",
     "lucide-react": "^0.263.1",

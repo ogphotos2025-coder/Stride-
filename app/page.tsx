@@ -19,6 +19,7 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = useState(false)
 
   const handleSaveEntry = async () => {
+    console.log('Session object during save attempt:', session);
     if (!session?.user?.id) {
       setSaveError('You must be signed in to save entries.')
       return

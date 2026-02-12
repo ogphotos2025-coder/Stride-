@@ -23,12 +23,8 @@ WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can view their own daily entries"
 ON public.daily_entries
-FOR SELECT
 USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own daily entries"
-ON public.daily_entries
-FOR UPDATE
 USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own daily entries"
