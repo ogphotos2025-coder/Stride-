@@ -27,11 +27,15 @@ export async function POST(req: NextRequest) {
 
     let embedding = null
     if (journal_entry && journal_entry.trim().length > 0) {
+      console.log('Generating embedding for entry:', journal_entry.substring(0, 50) + '...')
       try {
         embedding = await generateEmbedding(journal_entry)
-      } catch (err) {
-        console.error('Failed to generate embedding, continuing without it:', err)
+        console.log('Embedding generated successfully. Length:', embedding?.length)
+      } catch (err: any) {
+        console.error('Failed to generate embedding:', err.message)
       }
+    } else {
+      console.log('No journal entry provided, skipping embedding.')
     }
 
     const newEntry: any = {
@@ -43,8 +47,13 @@ export async function POST(req: NextRequest) {
       embedding: embedding
     }
 
-    const entry = await addDailyEntry(newEntry)
-    console.log('Daily Entry Saved Successfully:', entry)
+    const entry = await addDailyEntry(newEntry) as any
+    console.log('Daily Entry Saved to Supabase:', {
+      id: entry?.id,
+      date: entry?.date,
+      mood: entry?.mood,
+      has_embedding: !!entry?.embedding
+    })
     return NextResponse.json(entry, { status: 201 })
   } catch (error: any) {
     console.error('CRITICAL ERROR in /api/daily-entry:', error)

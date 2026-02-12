@@ -45,6 +45,12 @@ export default function WeeklyChart() {
 
       try {
         const weekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 })
+        weekEnd.setHours(23, 59, 59, 999) // Ensure full end day
+
+        console.log('Fetching WeeklyChart data for range:', {
+          start: currentWeekStart.toISOString(),
+          end: weekEnd.toISOString()
+        })
 
         // Fetch Steps from Google Fit
         const fitRes = await fetch(`/api/googlefit?startTime=${currentWeekStart.getTime()}&endTime=${weekEnd.getTime()}`)
@@ -79,8 +85,11 @@ export default function WeeklyChart() {
           weekEnd
         )
 
+        console.log('Fetched mood entries:', entries?.length)
+
         const moodMap = new Map<string, number[]>()
         entries.forEach((entry: DailyEntry) => {
+          console.log('Processing entry for mapping:', { date: entry.date, mood: entry.mood })
           if (!moodMap.has(entry.date)) {
             moodMap.set(entry.date, [])
           }

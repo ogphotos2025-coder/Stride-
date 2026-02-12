@@ -4,11 +4,17 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function generateEmbedding(text: string) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'text-embedding-004' })
-        const result = await model.embedContent(text)
+        // Using confirmed working model name for this API key
+        const model = genAI.getGenerativeModel({ model: 'gemini-embedding-001' })
+        // Specify the dimension to match our Supabase vector(1536) column
+        const result = await model.embedContent({
+            content: { parts: [{ text }], role: 'user' },
+            taskType: 'RETRIEVAL_DOCUMENT',
+            outputDimensionality: 1536
+        })
         return result.embedding.values
-    } catch (error) {
-        console.error('Error generating embedding:', error)
+    } catch (error: any) {
+        console.error('Error generating embedding:', error.message)
         throw error
     }
 }
@@ -18,7 +24,8 @@ export async function generateInsight(
     pastEntries: any[]
 ) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        // Using confirmed working flash model
+        const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' })
 
         const context = pastEntries.map(e =>
             `Date: ${e.date}, Mood: ${e.mood}, Entry: ${e.journal_entry}`

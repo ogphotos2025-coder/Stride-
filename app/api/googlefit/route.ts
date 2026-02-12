@@ -18,11 +18,33 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Missing access token.' }, { status: 401 })
   }
 
-  const now = endParam ? new Date(parseInt(endParam)) : new Date()
-  const startTime = startParam ? new Date(parseInt(startParam)) : new Date()
+  let now = endParam ? new Date(parseInt(endParam)) : new Date()
+  let startTime = startParam ? new Date(parseInt(startParam)) : new Date()
+
   if (!startParam) {
-    startTime.setDate(now.getDate() - 7)
+    // Default to start of day 6 days ago (for a full 7-day week including today)
+    startTime = new Date()
+    startTime.setDate(startTime.getDate() - 6)
+    startTime.setHours(0, 0, 0, 0)
+  } else {
+    // If a start time is provided, ensure it's aligned to start of that day
+    startTime.setHours(0, 0, 0, 0)
   }
+
+  if (!endParam) {
+    // End time is now
+    now = new Date()
+  } else {
+    // If an end time is provided, ensure it covers the whole end day
+    now.setHours(23, 59, 59, 999)
+  }
+
+  console.log('Google Fit API Request Range:', {
+    start: startTime.toISOString(),
+    end: now.toISOString(),
+    startMillis: startTime.getTime(),
+    endMillis: now.getTime()
+  })
 
   try {
     const response = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
@@ -33,8 +55,7 @@ export async function GET(req: Request) {
       },
       body: JSON.stringify({
         aggregateBy: [{
-          dataTypeName: 'com.google.step_count.delta',
-          dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps'
+          dataTypeName: 'com.google.step_count.delta'
         }],
         bucketByTime: { durationMillis: 86400000 }, // 1 day in milliseconds
         startTimeMillis: startTime.getTime(),
