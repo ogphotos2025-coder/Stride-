@@ -183,7 +183,12 @@ export default function WeeklyChart() {
           <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <XAxis
               dataKey="date"
-              tickFormatter={(date) => format(new Date(date), 'EEE')}
+              tickFormatter={(dateStr) => {
+                // Ensure we parse the date string (YYYY-MM-DD) as local time, not UTC
+                const [year, month, day] = dateStr.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                return format(date, 'EEE');
+              }}
               stroke="var(--text-muted)"
               fontSize={14}
               fontWeight="bold"
