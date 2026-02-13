@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabaseAdmin as supabase } from './supabase'
 import { DailyEntry } from '@/types'
 import { format, subDays } from 'date-fns'
 
