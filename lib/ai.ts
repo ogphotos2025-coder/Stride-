@@ -29,9 +29,9 @@ export async function generateInsight(
             return "Keep going! (API Key Missing)"
         }
 
-        // Using 'gemini-1.5-flash' with safety overrides to prevent silent blocks
+        // Using 'gemini-2.0-flash' as the primary model to avoid the 1.5-flash 404 errors
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.0-flash',
             safetySettings: [
                 { category: 'HARM_CATEGORY_HARASSMENT' as any, threshold: 'BLOCK_NONE' as any },
                 { category: 'HARM_CATEGORY_HATE_SPEECH' as any, threshold: 'BLOCK_NONE' as any },
@@ -82,7 +82,7 @@ export async function generateInsight(
         const errorMsg = error.message || ''
         console.error('RAG CRITICAL ERROR in generateInsight:', {
             message: errorMsg,
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.0-flash',
             status: error.status,
             stack: error.stack
         })
