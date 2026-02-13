@@ -14,20 +14,26 @@ export async function GET(req: NextRequest) {
         tests: {}
     }
 
-    // Test 1: Gemini Connectivity
-    try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-        const testResult = await model.generateContent("Say 'HEALTHY'")
-        results.tests.gemini = {
-            status: 'ok',
-            response: testResult.response.text().trim()
-        }
-    } catch (e: any) {
-        results.tests.gemini = {
-            status: 'error',
-            message: e.message,
-            stack: e.stack?.split('\n').slice(0, 3)
+    // Test 1: Gemini Connectivity (Multi-Model Sweep)
+    const modelsToTest = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest', 'gemini-pro-latest']
+    results.tests.gemini = []
+
+    for (const modelName of modelsToTest) {
+        try {
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+            const model = genAI.getGenerativeModel({ model: modelName })
+            const testResult = await model.generateContent("Say 'READY'")
+            results.tests.gemini.push({
+                model: modelName,
+                status: 'ok',
+                response: testResult.response.text().trim()
+            })
+        } catch (e: any) {
+            results.tests.gemini.push({
+                model: modelName,
+                status: 'error',
+                message: e.message
+            })
         }
     }
 
