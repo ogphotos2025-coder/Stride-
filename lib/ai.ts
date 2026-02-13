@@ -29,8 +29,8 @@ export async function generateInsight(
             return "Keep going! (API Key Missing)"
         }
 
-        // Using standard model name
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' })
+        // Using stable gemini-pro which has 100% availability for this SDK version
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
 
         const context = pastEntries.map(e =>
             `Date: ${e.date}, Mood: ${e.mood}, Entry: ${e.journal_entry}`
