@@ -1,7 +1,68 @@
+'use client'
+import { useState } from 'react'
+import MoodLogger from '@/components/MoodLogger'
+import JournalEntry from '@/components/JournalEntry'
+import StepCounter from '@/components/StepCounter'
+import InsightCard from '@/components/InsightCard'
+import WeeklyChart from '@/components/WeeklyChart'
 import TrainingLog from '@/components/TrainingLog'
+import Link from 'next/link'
+import { Settings } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { format } from 'date-fns'
 
 export default function Home() {
-  // ... existing states ...
+  const { data: session } = useSession()
+  const [selectedMood, setSelectedMood] = useState<string | null>(null)
+  const [journalEntryText, setJournalEntryText] = useState('')
+  const [dailySteps, setDailySteps] = useState<number>(0)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
+  const handleSaveEntry = async () => {
+    if (!session?.user?.id) {
+      setSaveError('Sign in to sync your progress.')
+      return
+    }
+    if (!selectedMood) {
+      setSaveError('Record your mental state.')
+      return
+    }
+
+    setIsSaving(true)
+    setSaveError(null)
+    setSaveSuccess(false)
+
+    try {
+      const response = await fetch('/api/daily-entry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mood: selectedMood,
+          journal_entry: journalEntryText,
+          step_count: dailySteps,
+          date: format(new Date(), 'yyyy-MM-dd'),
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to finish.')
+      }
+
+      setSaveSuccess(true)
+      // Refresh the page or the TrainingLog component could be refreshed by a parent state change
+      // For now, simple page reload or just UI feedback is fine as the TrainingLog fetches on mount.
+    } catch (error: any) {
+      setSaveError(error.message || 'Connection error.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   return (
     <main className="min-h-screen pb-20">
       {/* Marathon Header - Straightened */}
@@ -23,18 +84,67 @@ export default function Home() {
       </header>
 
       <div className="max-w-6xl mx-auto px-6">
-        {/* ... existing grid ... */}
-        <section id="training-log">
-          <h2 className="text-4xl mb-6 flex items-center gap-3 italic">
-            <span className="w-2 h-10 bg-orange-400 block"></span>
-            Training Log
-          </h2>
-          <TrainingLog />
-        </section>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Left Column: Logging */}
+          <div className="lg:col-span-7 space-y-12">
+            <div className="marathon-card bg-blue-50 border-blue-100 border-l-8 border-l-[var(--primary-navy)]">
+              <h2 className="text-3xl mb-6 text-[var(--primary-navy)]">MOOD</h2>
+              <MoodLogger
+                selectedMood={selectedMood}
+                setSelectedMood={setSelectedMood}
+              />
+            </div>
+
+            <div className="marathon-card">
+              <h2 className="text-3xl mb-4">Training Progress</h2>
+              <StepCounter dailySteps={dailySteps} setDailySteps={setDailySteps} />
+            </div>
+
+            <div className="marathon-card bg-[var(--primary-navy)] text-white border-none shadow-2xl">
+              <JournalEntry
+                journalEntryText={journalEntryText}
+                setJournalEntryText={setJournalEntryText}
+                onSave={handleSaveEntry}
+                isSaving={isSaving}
+                saveError={saveError}
+                saveSuccess={saveSuccess}
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Insights */}
+          <div className="lg:col-span-5 space-y-12">
+            <div className="sticky top-12 space-y-12">
+              <section>
+                <h2 className="text-4xl mb-6 flex items-center gap-3 italic">
+                  <span className="w-2 h-10 bg-[var(--accent-orange)] block"></span>
+                  Soul Insights
+                </h2>
+                <InsightCard />
+              </section>
+
+              <section>
+                <h2 className="text-4xl mb-6 flex items-center gap-3 italic">
+                  <span className="w-2 h-10 bg-[var(--primary-navy)] block"></span>
+                  Weekly Stride
+                </h2>
+                <WeeklyChart />
+              </section>
+            </div>
+          </div>
+        </div>
+
+        {/* Training Log Section */}
+        <div className="mt-20">
+          <section id="training-log">
+            <h2 className="text-4xl mb-6 flex items-center gap-3 italic uppercase">
+              <span className="w-2 h-10 bg-orange-400 block"></span>
+              Athlete Archive
+            </h2>
+            <TrainingLog />
+          </section>
+        </div>
       </div>
-    </div>
-        </div >
-      </div >
-    </main >
+    </main>
   )
 }
