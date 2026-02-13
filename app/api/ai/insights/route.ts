@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
                     console.error('RAG ERROR: match_entries RPC failed:', matchError)
                 } else {
                     matchingMemories = (matches as any[] || []).filter((m: any) => m.id !== latest.id)
-                    console.log(`RAG DEBUG: Found ${matchingMemories.length} relevant past entries.`)
+                    console.log(`RAG DEBUG: Found ${matchingMemories.length} relevant past entries:`, matchingMemories.map(m => m.id))
                 }
             } catch (embedError: any) {
                 console.error('RAG ERROR: Embedding step failed:', embedError.message)

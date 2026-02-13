@@ -58,11 +58,16 @@ export async function generateInsight(
       7. Keep the total response under 3 concise sentences.
     `
 
+        console.log('RAG DEBUG: Prompt prepared. Character count:', prompt.length)
         const result = await model.generateContent(prompt)
-        return result.response.text()
+        const responseText = result.response.text()
+        console.log('RAG DEBUG: Insight generated successfully.')
+        return responseText
     } catch (error: any) {
         console.error('RAG CRITICAL ERROR in generateInsight:', {
             message: error.message,
+            model: 'gemini-1.5-flash',
+            has_context: !!context,
             stack: error.stack
         })
         return "Keep going! Every step counts toward a better day."
