@@ -67,8 +67,7 @@ export async function generateInsight(
     } catch (error: any) {
         console.error('RAG CRITICAL ERROR in generateInsight:', {
             message: error.message,
-            model: 'gemini-1.5-flash',
-            has_context: !!context,
+            model: 'gemini-2.0-flash',
             stack: error.stack
         })
         return "Keep going! Every step counts toward a better day."
