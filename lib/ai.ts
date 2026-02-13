@@ -79,17 +79,26 @@ export async function generateInsight(
         console.log('RAG DEBUG: Insight generated successfully.')
         return responseText
     } catch (error: any) {
+        const errorMsg = error.message || ''
         console.error('RAG CRITICAL ERROR in generateInsight:', {
-            message: error.message,
+            message: errorMsg,
             model: 'gemini-1.5-flash',
             status: error.status,
             stack: error.stack
         })
 
-        if (error.message?.includes('429')) {
-            return "I'm analyzing your data in the background. Keep your pace, and I'll have a tactical breakdown for you shortly."
+        if (errorMsg.includes('429')) {
+            return "Processing high athlete volume. Your tactical breakdown is queued. Stay focused on your pace."
         }
 
-        return "Keep going! Every step counts toward a better day."
+        if (errorMsg.includes('API_KEY_INVALID')) {
+            return "Connection to Performance Coach lost. Please verify your API Key in environment settings."
+        }
+
+        if (errorMsg.includes('500') || errorMsg.includes('503')) {
+            return "Training server is momentarily down. Maintain your momentum—I'll be back online soon."
+        }
+
+        return "Keep going! Your effort today is the foundation for tomorrow's performance."
     }
 }
