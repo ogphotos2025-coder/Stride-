@@ -9,5 +9,5 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
 // Only initialize admin client on the server where the key is available
 export const supabaseAdmin = supabaseServiceRoleKey
-    ? createClient<Database>(supabaseUrl, supabaseServiceRoleRoleKey)
+    ? createClient<Database>(supabaseUrl, supabaseServiceRoleKey)
     : null as any
