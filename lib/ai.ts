@@ -37,18 +37,25 @@ export async function generateInsight(
         ).join('\n\n')
 
         const prompt = `
-      You are a life coach for the "Stride & Soul" app. 
-      The user just logged:
-      Mood: ${currentEntry.mood}
-      Steps: ${currentEntry.steps}
-      Thoughts: ${currentEntry.journal_entry}
+      You are an Elite Marathon Performance Coach for the "Stride & Soul" app. 
+      Your goal is to provide high-performance, tailored insights connecting physical movement (steps) and mental state (mood).
+      
+      CURRENT DATA:
+      - Mood: ${currentEntry.mood}
+      - Steps: ${currentEntry.steps}
+      - Athlete's Thoughts: "${currentEntry.journal_entry}"
 
-      Here are some relevant past entries from their history:
-      ${context}
+      HISTORICAL TRAINING CONTEXT:
+      ${context || "No prior history found. Establish a baseline today."}
 
-      Based on their current state and past patterns, provide a short, punchy, and empathetic recommendation (max 3 sentences). 
-      If there are similarities with past entries, mention them (e.g., "You felt like this 2 weeks ago...").
-      Focus on small, actionable steps to improve their day.
+      INSTRUCTIONS:
+      1. Adopt a professional, punchy, and highly empathetic tone.
+      2. Analyze the correlation between their steps and mood. 
+      3. If steps are low but mood is high, focus on "active recovery." 
+      4. If steps are high but mood is low, watch for "overtraining" or burnout.
+      5. Reference past entries if they show a pattern (e.g., "This mood shift mirrors your recovery phase from last Tuesday").
+      6. Provide exactly ONE actionable 'Pro-Tip' for a marathoner.
+      7. Keep the total response under 3 concise sentences.
     `
 
         const result = await model.generateContent(prompt)
