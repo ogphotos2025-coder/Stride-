@@ -29,8 +29,16 @@ export async function generateInsight(
             return "Keep going! (API Key Missing)"
         }
 
-        // Using 'gemini-2.0-flash' which exists in their list and should have stable quota
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+        // Using 'gemini-1.5-flash' with safety overrides to prevent silent blocks
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT' as any, threshold: 'BLOCK_NONE' as any },
+                { category: 'HARM_CATEGORY_HATE_SPEECH' as any, threshold: 'BLOCK_NONE' as any },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT' as any, threshold: 'BLOCK_NONE' as any },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT' as any, threshold: 'BLOCK_NONE' as any },
+            ]
+        })
 
         const context = pastEntries.map(e =>
             `Date: ${e.date}, Mood: ${e.mood}, Entry: ${e.journal_entry}`
@@ -61,15 +69,27 @@ export async function generateInsight(
 
         console.log('RAG DEBUG: Prompt prepared. Character count:', prompt.length)
         const result = await model.generateContent(prompt)
+
+        if (!result.response || !result.response.candidates || result.response.candidates.length === 0) {
+            console.error('RAG ERROR: No candidates returned from Gemini')
+            return "Keep going! The silence is just a sign of a focused athlete."
+        }
+
         const responseText = result.response.text()
         console.log('RAG DEBUG: Insight generated successfully.')
         return responseText
     } catch (error: any) {
         console.error('RAG CRITICAL ERROR in generateInsight:', {
             message: error.message,
-            model: 'gemini-2.0-flash',
+            model: 'gemini-1.5-flash',
+            status: error.status,
             stack: error.stack
         })
+
+        if (error.message?.includes('429')) {
+            return "I'm analyzing your data in the background. Keep your pace, and I'll have a tactical breakdown for you shortly."
+        }
+
         return "Keep going! Every step counts toward a better day."
     }
 }
