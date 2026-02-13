@@ -29,8 +29,8 @@ export async function generateInsight(
             return "Keep going! (API Key Missing)"
         }
 
-        // Using stable model name
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        // Using standard model name
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' })
 
         const context = pastEntries.map(e =>
             `Date: ${e.date}, Mood: ${e.mood}, Entry: ${e.journal_entry}`
