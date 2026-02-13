@@ -29,8 +29,8 @@ export async function generateInsight(
             return "Keep going! (API Key Missing)"
         }
 
-        // Using 'gemini-1.5-flash' for stable 1,500 RPD quota
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        // Using 'gemini-2.0-flash' which exists in their list and should have stable quota
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
         const context = pastEntries.map(e =>
             `Date: ${e.date}, Mood: ${e.mood}, Entry: ${e.journal_entry}`
@@ -49,13 +49,14 @@ export async function generateInsight(
       ${context || "No prior history found. Establish a baseline today."}
 
       INSTRUCTIONS:
-      1. Adopt a professional, punchy, and highly empathetic tone.
-      2. Analyze the correlation between their steps and mood. 
-      3. If steps are low but mood is high, focus on "active recovery." 
-      4. If steps are high but mood is low, watch for "overtraining" or burnout.
-      5. Reference past entries if they show a pattern (e.g., "This mood shift mirrors your recovery phase from last Tuesday").
-      6. Provide exactly ONE actionable 'Pro-Tip' for a marathoner.
-      7. Keep the total response under 3 concise sentences.
+      1. Detect the language of the "Athlete's Thoughts" and provide your response in that SAME language.
+      2. Adopt a professional, punchy, and highly empathetic tone.
+      3. Analyze the correlation between their steps and mood. 
+      4. If steps are low but mood is high, focus on "active recovery." 
+      5. If steps are high but mood is low, watch for "overtraining" or burnout.
+      6. Reference past entries if they show a pattern (e.g., "This mood shift mirrors your recovery phase from last Tuesday").
+      7. Provide exactly ONE actionable 'Pro-Tip' for a marathoner.
+      8. Keep the total response under 3 concise sentences.
     `
 
         console.log('RAG DEBUG: Prompt prepared. Character count:', prompt.length)
