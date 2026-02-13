@@ -1,3 +1,6 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { addDailyEntry, getDailyEntries } from '@/lib/database'
 import { DailyEntry } from '@/types'
 import { format, parseISO } from 'date-fns'
