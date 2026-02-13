@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   try {
     const { mood, journal_entry, step_count, date } = await req.json()
 
-    if (!mood || !step_count) {
+    if (mood === undefined || mood === null || step_count === undefined || step_count === null) {
       return NextResponse.json(
         { error: 'Mood and step count are required' },
         { status: 400 }
