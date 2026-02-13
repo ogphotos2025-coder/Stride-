@@ -5,6 +5,7 @@ export default function InsightCard() {
   const [insight, setInsight] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [language, setLanguage] = useState<'en' | 'es'>('en')
 
   useEffect(() => {
     const fetchInsight = async () => {
@@ -40,17 +41,38 @@ export default function InsightCard() {
     )
   }
 
+  const displayText = language === 'en' ? insight.insight_text : (insight.insight_es || insight.insight_text)
+
   return (
     <div className="marathon-card bg-white border-l-8 border-l-[var(--accent-orange)]">
-      <h3 className="text-3xl mb-6">Performance Coach</h3>
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-3xl">Performance Coach</h3>
+        <div className="flex border-2 border-[var(--primary-navy)] rounded-lg overflow-hidden text-xs font-bold uppercase">
+          <button
+            onClick={() => setLanguage('en')}
+            className={`px-3 py-1 transition-colors ${language === 'en' ? 'bg-[var(--primary-navy)] text-white' : 'bg-white text-[var(--primary-navy)] hover:bg-gray-100'}`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setLanguage('es')}
+            className={`px-3 py-1 transition-colors ${language === 'es' ? 'bg-[var(--primary-navy)] text-white' : 'bg-white text-[var(--primary-navy)] hover:bg-gray-100'}`}
+          >
+            ES
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-6">
-        <p className="text-xl leading-relaxed italic text-[var(--text-main)] italic">
-          "{insight.insight_text}"
+        <p className="text-xl leading-relaxed italic text-[var(--text-main)]">
+          "{displayText}"
         </p>
 
         <div className="bg-[var(--primary-navy)] p-8 rounded-2xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-          <h4 className="border-b border-white/10 pb-2 mb-4">Tomorrow's Milestone</h4>
+          <h4 className="border-b border-white/10 pb-2 mb-4 text-white/60 text-xs font-bold uppercase tracking-widest">
+            {language === 'en' ? "Tomorrow's Milestone" : "Meta para Mañana"}
+          </h4>
           <p className="text-2xl font-black italic text-orange-400 leading-tight uppercase">
             {insight.tomorrow_micro_goal}
           </p>
@@ -59,7 +81,7 @@ export default function InsightCard() {
       <div className="mt-8 flex justify-end">
         <button className="flex items-center gap-3 group text-gray-400 font-bold uppercase text-xs tracking-widest hover:text-[var(--accent-orange)] transition-colors">
           <ThumbsUp size={18} className="group-hover:scale-125 transition-transform" />
-          <span>Helpful Insight</span>
+          <span>{language === 'en' ? "Helpful Insight" : "Útil"}</span>
         </button>
       </div>
     </div>

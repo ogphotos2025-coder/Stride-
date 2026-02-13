@@ -57,14 +57,18 @@ export async function generateInsight(
       ${context || "No prior history found. Establish a baseline today."}
 
       INSTRUCTIONS:
-      1. Detect the language of the "Athlete's Thoughts" and provide your response in that SAME language.
-      2. Adopt a professional, punchy, and highly empathetic tone.
-      3. Analyze the correlation between their steps and mood. 
-      4. If steps are low but mood is high, focus on "active recovery." 
-      5. If steps are high but mood is low, watch for "overtraining" or burnout.
-      6. Reference past entries if they show a pattern (e.g., "This mood shift mirrors your recovery phase from last Tuesday").
-      7. Provide exactly ONE actionable 'Pro-Tip' for a marathoner.
-      8. Keep the total response under 3 concise sentences.
+      1. Provide your response in English.
+      2. Then provide a Spanish translation.
+      3. Format your response EXACTLY like this:
+         <en>English insight here</en>
+         <es>Traducción al español aquí</es>
+      4. Adopt a professional, punchy, and highly empathetic tone.
+      5. Analyze the correlation between their steps and mood. 
+      6. If steps are low but mood is high, focus on "active recovery." 
+      7. If steps are high but mood is low, watch for "overtraining" or burnout.
+      8. Reference past entries if they show a pattern (e.g., "This mood shift mirrors your recovery phase from last Tuesday").
+      9. Provide exactly ONE actionable 'Pro-Tip' for a marathoner.
+      10. Keep each version under 3 concise sentences.
     `
 
         console.log('RAG DEBUG: Prompt prepared. Character count:', prompt.length)

@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
         }
 
         // 4. Generate the personalized insight using Gemini
-        const insightText = await generateInsight(
+        const rawInsight = await generateInsight(
             {
                 mood: latest.mood,
                 journal_entry: latest.journal_entry || "",
@@ -70,9 +70,17 @@ export async function GET(req: NextRequest) {
             matchingMemories
         )
 
+        // Parse XML-style tags
+        const enMatch = rawInsight.match(/<en>([\s\S]*?)<\/en>/)
+        const esMatch = rawInsight.match(/<es>([\s\S]*?)<\/es>/)
+
+        const insight_en = enMatch ? enMatch[1].trim() : rawInsight
+        const insight_es = esMatch ? esMatch[1].trim() : ""
+
         return NextResponse.json({
             detected_mood: latest.mood,
-            insight_text: insightText,
+            insight_text: insight_en, // Main language
+            insight_es: insight_es,   // Translation
             tomorrow_micro_goal: latest.step_count < 5000
                 ? "Try to hit 6,000 steps tomorrow for a mood boost."
                 : "Keep up this momentum! You're crushing your step goals."
