@@ -24,8 +24,13 @@ export async function generateInsight(
     pastEntries: any[]
 ) {
     try {
-        // Using confirmed working flash model
-        const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' })
+        if (!process.env.GEMINI_API_KEY) {
+            console.error('RAG ERROR: GEMINI_API_KEY is missing in environment')
+            return "Keep going! (API Key Missing)"
+        }
+
+        // Using stable model name
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
         const context = pastEntries.map(e =>
             `Date: ${e.date}, Mood: ${e.mood}, Entry: ${e.journal_entry}`
@@ -48,8 +53,11 @@ export async function generateInsight(
 
         const result = await model.generateContent(prompt)
         return result.response.text()
-    } catch (error) {
-        console.error('Error generating insight:', error)
+    } catch (error: any) {
+        console.error('RAG CRITICAL ERROR in generateInsight:', {
+            message: error.message,
+            stack: error.stack
+        })
         return "Keep going! Every step counts toward a better day."
     }
 }

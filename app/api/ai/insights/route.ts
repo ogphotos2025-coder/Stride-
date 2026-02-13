@@ -37,26 +37,26 @@ export async function GET(req: NextRequest) {
         // 2. Generate embedding for the latest entry if it exists
         let matchingMemories = []
         if (latest.journal_entry) {
+            console.log('RAG DEBUG: Generating embedding for search...')
             try {
                 const embedding = await generateEmbedding(latest.journal_entry)
+                console.log('RAG DEBUG: Embedding generated. Searching history...')
 
-                // 3. Search for similar past entries using the RPC function we created
                 const { data: matches, error: matchError } = await (supabase as any).rpc('match_entries', {
                     query_embedding: embedding,
-                    match_threshold: 0.5,
+                    match_threshold: 0.3, // Temporarily lowering to 0.3 to ensure we find *something*
                     match_count: 3,
                     p_user_id: session.user.id
                 })
 
                 if (matchError) {
-                    console.error('Supabase RPC Error (match_entries):', matchError)
+                    console.error('RAG ERROR: match_entries RPC failed:', matchError)
                 } else {
-                    // Filter out the current entry from matches
                     matchingMemories = (matches as any[] || []).filter((m: any) => m.id !== latest.id)
+                    console.log(`RAG DEBUG: Found ${matchingMemories.length} relevant past entries.`)
                 }
-            } catch (embedError) {
-                console.error('Embedding Generation Error:', embedError)
-                // Continue without memories if embedding fails
+            } catch (embedError: any) {
+                console.error('RAG ERROR: Embedding step failed:', embedError.message)
             }
         }
 
