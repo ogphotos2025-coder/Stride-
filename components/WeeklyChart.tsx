@@ -14,7 +14,6 @@ import {
 import { useSession } from 'next-auth/react'
 import { addDays, subDays, startOfWeek, endOfWeek, format } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getDailyEntries } from '@/lib/database'
 import { DailyEntry } from '@/types'
 
 // Map mood strings to numerical scores for charting
@@ -78,12 +77,9 @@ export default function WeeklyChart() {
           })
         }
 
-        // Fetch Moods from Supabase
-        const entries = await getDailyEntries(
-          session.user.id as string,
-          currentWeekStart,
-          weekEnd
-        )
+        // Fetch Moods from Supabase via API
+        const entryRes = await fetch(`/api/daily-entry?start=${currentWeekStart.toISOString()}&end=${weekEnd.toISOString()}`)
+        const entries = await entryRes.json()
 
         console.log('Fetched mood entries:', entries?.length)
 

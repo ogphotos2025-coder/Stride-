@@ -1,10 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { addDailyEntry } from '@/lib/database'
+import { addDailyEntry, getDailyEntries } from '@/lib/database'
 import { DailyEntry } from '@/types'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { generateEmbedding } from '@/lib/ai'
+
+export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  const { searchParams } = new URL(req.url)
+  const start = searchParams.get('start')
+  const end = searchParams.get('end')
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+
+  try {
+    const startDate = start ? parseISO(start) : undefined
+    const endDate = end ? parseISO(end) : undefined
+
+    const entries = await getDailyEntries(session.user.id, startDate, endDate)
+    return NextResponse.json(entries)
+  } catch (error: any) {
+    console.error('Error in GET /api/daily-entry:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch entries', details: error.message },
+      { status: 500 }
+    )
+  }
+}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
